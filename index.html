@@ -306,6 +306,21 @@
 </main>
 
 <script>
+    const firebaseConfig = {
+        apiKey: "AIzaSyA9aDL6TtLLs1WUl17NTLxnmaM6V1iP8Pc",
+        authDomain: "gloliath.firebaseapp.com",
+        databaseURL: "https://gloliath-default-rtdb.europe-west1.firebasedatabase.app",
+        projectId: "gloliath",
+        storageBucket: "gloliath.firebasestorage.app",
+        messagingSenderId: "699271135679",
+        appId: "1:699271135679:web:fd4b0c5dae74aca2f9610a",
+        measurementId: "G-T2E6Z1JSVN"
+    };
+
+    const app = firebase.initializeApp(firebaseConfig);
+    const database = firebase.database();
+    const tasksRef = database.ref('tasks');
+    
     // --- 1. COMPTE À REBOURS (Paramétré pour début Mai 2027, modifiable) ---
     const targetDate = new Date("May 3, 2027 08:00:00").getTime();
 
