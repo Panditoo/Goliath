@@ -5,12 +5,16 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Polytechnique | L'Exigence Absolue</title>
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,600;0,700;1,600&family=Inter:wght@300;400;500;700&display=swap" rel="stylesheet">
+    
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
+
     <style>
         :root {
-            --bg-color: #030712; /* Bleu nuit ultra sombre */
+            --bg-color: #030712;
             --text-color: #e2e8f0;
-            --accent-color: #d4af37; /* Or */
-            --x-red: #8a1538; /* Rouge Polytechnique */
+            --accent-color: #d4af37;
+            --x-red: #8a1538;
             --card-bg: #0f172a;
             --border-color: #1e293b;
             --danger: #ef4444;
@@ -30,7 +34,6 @@
             text-align: center;
             border-bottom: 1px solid var(--border-color);
             background: linear-gradient(180deg, #020617 0%, var(--bg-color) 100%);
-            position: relative;
         }
 
         .motto {
@@ -40,14 +43,13 @@
             font-size: 1rem;
             letter-spacing: 1px;
             margin-bottom: 1rem;
-            opacity: 0.9;
         }
 
         h1 {
             font-family: 'Playfair Display', serif;
             font-size: 3rem;
             letter-spacing: 4px;
-            margin: 0 0 10px 0;
+            margin: 0;
             color: #ffffff;
             text-transform: uppercase;
         }
@@ -82,7 +84,6 @@
             border: 1px solid var(--border-color);
             padding: 2rem;
             border-radius: 2px;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
         }
 
         h2 {
@@ -90,19 +91,16 @@
             border-bottom: 1px solid var(--border-color);
             padding-bottom: 0.8rem;
             margin-top: 0;
-            font-size: 1.4rem;
             color: var(--accent-color);
             display: flex;
             align-items: center;
             justify-content: space-between;
         }
 
-        /* Task Manager */
         .task-input-container {
             display: flex;
             gap: 10px;
-            margin-bottom: 20px;
-            margin-top: 20px;
+            margin: 20px 0;
         }
 
         input[type="text"] {
@@ -111,12 +109,6 @@
             background: rgba(0, 0, 0, 0.5);
             border: 1px solid var(--border-color);
             color: white;
-            font-family: 'Inter', sans-serif;
-        }
-
-        input[type="text"]:focus {
-            outline: none;
-            border-color: var(--accent-color);
         }
 
         button.add-btn {
@@ -126,33 +118,14 @@
             padding: 10px 25px;
             font-weight: 700;
             cursor: pointer;
-            transition: all 0.3s;
-            font-family: 'Inter', sans-serif;
-            letter-spacing: 1px;
         }
 
-        button.add-btn:hover {
-            background: #a31a43;
-        }
-
-        .task-list {
-            list-style: none;
-            padding: 0;
-            margin: 0;
-        }
-
+        .task-list { list-style: none; padding: 0; }
         .task-item {
             display: flex;
             justify-content: space-between;
-            align-items: center;
             padding: 15px 0;
             border-bottom: 1px solid var(--border-color);
-        }
-
-        .task-text {
-            cursor: pointer;
-            transition: all 0.2s;
-            font-size: 0.95rem;
         }
 
         .task-item.completed .task-text {
@@ -160,107 +133,32 @@
             color: #475569;
         }
 
-        .delete-btn {
-            background: transparent;
-            color: #475569;
-            padding: 5px 10px;
-            border: none;
-            cursor: pointer;
-        }
-
-        .delete-btn:hover {
-            color: var(--danger);
-        }
-
-        /* Pomodoro */
-        .pomodoro-container {
-            text-align: center;
-            margin-bottom: 2rem;
-        }
-
         .timer {
             font-size: 4.5rem;
             font-family: 'Playfair Display', serif;
             font-weight: 700;
-            margin: 10px 0;
-            color: white;
-            letter-spacing: 2px;
+            text-align: center;
         }
 
+        .timer-controls { text-align: center; }
         .timer-controls button {
             background: transparent;
             color: var(--text-color);
             border: 1px solid var(--border-color);
             padding: 8px 20px;
-            margin: 0 5px;
             cursor: pointer;
-            font-family: 'Inter', sans-serif;
-            text-transform: uppercase;
-            font-size: 0.8rem;
-            letter-spacing: 1px;
-            transition: all 0.2s;
         }
 
         .timer-controls button.start {
             background: var(--accent-color);
             color: #000;
-            border-color: var(--accent-color);
             font-weight: 700;
         }
 
-        .timer-controls button.start:hover {
-            background: #ebd285;
-        }
-
-        .timer-controls button:hover:not(.start) {
-            border-color: var(--text-color);
-        }
-
-        /* Mentality Module */
         .mentality-container {
-            background: linear-gradient(145deg, #111827 0%, #030712 100%);
-            border: 1px solid var(--accent-color);
-            position: relative;
+            border-left: 4px solid var(--x-red);
+            margin-top: 2rem;
         }
-        
-        .mentality-container::before {
-            content: '';
-            position: absolute;
-            top: 0; left: 0; width: 4px; height: 100%;
-            background: var(--x-red);
-        }
-
-        .quote-text {
-            font-family: 'Playfair Display', serif;
-            font-size: 1.2rem;
-            line-height: 1.8;
-            margin-bottom: 1rem;
-            font-style: italic;
-        }
-
-        .quote-author {
-            font-size: 0.8rem;
-            text-transform: uppercase;
-            letter-spacing: 2px;
-            color: var(--accent-color);
-            font-weight: 700;
-        }
-
-        .refresh-quote {
-            background: none;
-            border: none;
-            color: #64748b;
-            cursor: pointer;
-            font-size: 0.8rem;
-            padding: 0;
-            margin-top: 15px;
-            text-decoration: underline;
-        }
-
-        .refresh-quote:hover {
-            color: var(--text-color);
-        }
-
     </style>
 </head>
 <body>
@@ -269,26 +167,23 @@
     <div class="motto">"Pour la Patrie, les Sciences et la Gloire"</div>
     <h1>ÉCOLE POLYTECHNIQUE</h1>
     <div class="countdown" id="countdown">
-        Ouverture Banque PT dans : <span id="days">000</span>J <span id="hours">00</span>H <span id="mins">00</span>M
+        Banque PT dans : <span id="days">000</span>J <span id="hours">00</span>H <span id="mins">00</span>M
     </div>
 </header>
 
 <main>
     <div class="card">
-        <h2>
-            Ordres de Marche 
-            <span style="font-size: 0.8rem; font-family: 'Inter'; font-weight: 400; color: #64748b;">(Sauvegarde Locale)</span>
-        </h2>
+        <h2>Ordres de Marche <span style="font-size: 0.8rem; color: #64748b;">(Sync Firebase Actif)</span></h2>
         <div class="task-input-container">
-            <input type="text" id="taskInput" placeholder="Ex: Cadrer la démonstration du Théorème de Cauchy-Lipschitz...">
+            <input type="text" id="taskInput" placeholder="Ex: Démonstration Cauchy-Lipschitz...">
             <button class="add-btn" onclick="addTask()">Exécuter</button>
         </div>
         <ul class="task-list" id="taskList"></ul>
     </div>
 
     <div>
-        <div class="card pomodoro-container">
-            <h2 style="justify-content: center;">Immersion Totale</h2>
+        <div class="card">
+            <h2 style="justify-content: center;">Immersion</h2>
             <div class="timer" id="timerDisplay">50:00</div>
             <div class="timer-controls">
                 <button class="start" onclick="startTimer()">Start</button>
@@ -297,15 +192,14 @@
         </div>
 
         <div class="card mentality-container">
-            <h2 style="border-bottom: none; margin-bottom: 10px; color: var(--text-color);">Règle de Conduite</h2>
-            <div class="quote-text" id="quoteText">Chargement...</div>
-            <div class="quote-author" id="quoteAuthor"></div>
-            <button class="refresh-quote" onclick="generateQuote()">Générer une nouvelle règle</button>
+            <div id="quoteText" style="font-style: italic; margin-bottom: 10px;">Chargement...</div>
+            <div id="quoteAuthor" style="color: var(--accent-color); font-weight: bold; font-size: 0.8rem;"></div>
         </div>
     </div>
 </main>
 
 <script>
+    // ÉTAPE 2 : CONFIGURATION ET INITIALISATION
     const firebaseConfig = {
         apiKey: "AIzaSyA9aDL6TtLLs1WUl17NTLxnmaM6V1iP8Pc",
         authDomain: "gloliath.firebaseapp.com",
@@ -313,30 +207,21 @@
         projectId: "gloliath",
         storageBucket: "gloliath.firebasestorage.app",
         messagingSenderId: "699271135679",
-        appId: "1:699271135679:web:fd4b0c5dae74aca2f9610a",
-        measurementId: "G-T2E6Z1JSVN"
+        appId: "1:699271135679:web:fd4b0c5dae74aca2f9610a"
     };
 
-    const app = firebase.initializeApp(firebaseConfig);
+    firebase.initializeApp(firebaseConfig);
     const database = firebase.database();
     const tasksRef = database.ref('tasks');
-    
-    // --- 1. COMPTE À REBOURS (Paramétré pour début Mai 2027, modifiable) ---
-    const targetDate = new Date("May 3, 2027 08:00:00").getTime();
 
+    // --- 1. COMPTE À REBOURS ---
+    const targetDate = new Date("May 3, 2027 08:00:00").getTime();
     function updateCountdown() {
         const now = new Date().getTime();
         const distance = targetDate - now;
-
-        if (distance < 0) {
-            document.getElementById("countdown").innerHTML = "<span>LES ÉPREUVES SONT EN COURS. AUCUN REGRET.</span>";
-            return;
-        }
-
         const days = Math.floor(distance / (1000 * 60 * 60 * 24));
         const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
         const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
-
         document.getElementById("days").innerText = days.toString().padStart(3, '0');
         document.getElementById("hours").innerText = hours.toString().padStart(2, '0');
         document.getElementById("mins").innerText = minutes.toString().padStart(2, '0');
@@ -344,76 +229,71 @@
     setInterval(updateCountdown, 1000);
     updateCountdown();
 
-    // --- 2. GESTIONNAIRE DE TÂCHES ---
-    let tasks = JSON.parse(localStorage.getItem('xTasks')) || [
-        {text: "Maîtriser les rapports de jury X-ENS des 5 dernières années", completed: false}
-    ];
+    // --- 2. GESTION DES TÂCHES AVEC FIREBASE ---
+    
+    // Écouter les changements en temps réel sur Firebase
+    tasksRef.on('value', (snapshot) => {
+        const data = snapshot.val();
+        renderTasks(data);
+    });
 
-    function renderTasks() {
+    function renderTasks(data) {
         const taskList = document.getElementById('taskList');
         taskList.innerHTML = '';
-        
-        tasks.forEach((task, index) => {
+        if (!data) return;
+
+        // On transforme l'objet Firebase en tableau pour l'afficher
+        Object.keys(data).forEach((id) => {
+            const task = data[id];
             const li = document.createElement('li');
             li.className = `task-item ${task.completed ? 'completed' : ''}`;
-            
             li.innerHTML = `
-                <span class="task-text" onclick="toggleTask(${index})">${task.text}</span>
-                <button class="delete-btn" onclick="deleteTask(${index})">✕</button>
+                <span class="task-text" style="cursor:pointer" onclick="toggleTask('${id}', ${task.completed})">${task.text}</span>
+                <button style="background:none; border:none; color:#475569; cursor:pointer" onclick="deleteTask('${id}')">✕</button>
             `;
             taskList.appendChild(li);
         });
-        localStorage.setItem('xTasks', JSON.stringify(tasks));
     }
 
     function addTask() {
         const input = document.getElementById('taskInput');
         const text = input.value.trim();
         if (text) {
-            tasks.unshift({ text: text, completed: false }); // Ajoute en haut de la liste
+            tasksRef.push({ text: text, completed: false });
             input.value = '';
-            renderTasks();
         }
     }
 
-    function toggleTask(index) {
-        tasks[index].completed = !tasks[index].completed;
-        renderTasks();
+    function toggleTask(id, currentStatus) {
+        tasksRef.child(id).update({ completed: !currentStatus });
     }
 
-    function deleteTask(index) {
-        tasks.splice(index, 1);
-        renderTasks();
+    function deleteTask(id) {
+        tasksRef.child(id).remove();
     }
 
-    document.getElementById('taskInput').addEventListener('keypress', function(e) {
-        if (e.key === 'Enter') addTask();
-    });
-
-    renderTasks();
-
-    // --- 3. MINUTEUR POMODORO (50 min) ---
+    // --- 3. POMODORO ---
     let timerInterval;
     let timeLeft = 50 * 60;
     let isRunning = false;
 
     function updateTimerDisplay() {
-        const minutes = Math.floor(timeLeft / 60);
-        const seconds = timeLeft % 60;
-        document.getElementById('timerDisplay').innerText = 
-            `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+        const min = Math.floor(timeLeft / 60);
+        const sec = timeLeft % 60;
+        document.getElementById('timerDisplay').innerText = `${min.toString().padStart(2, '0')}:${sec.toString().padStart(2, '0')}`;
     }
 
     function startTimer() {
         if (isRunning) return;
         isRunning = true;
         timerInterval = setInterval(() => {
-            timeLeft--;
-            updateTimerDisplay();
-            if (timeLeft <= 0) {
+            if (timeLeft > 0) {
+                timeLeft--;
+                updateTimerDisplay();
+            } else {
                 clearInterval(timerInterval);
                 isRunning = false;
-                alert("Fin de l'immersion. 10 minutes de pause stratégique.");
+                alert("Fin de session.");
                 resetTimer();
             }
         }, 1000);
@@ -426,26 +306,11 @@
         updateTimerDisplay();
     }
 
-    // --- 4. MODULE DE MENTALITÉ (Citations et Conseils) ---
-    const quotes = [
-        { text: "La difficulté n'est pas une excuse, c'est un filtre. Ce qui te bloque aujourd'hui éliminera les autres demain.", author: "Loi du Concours" },
-        { text: "À l'X en venant de PT, il n'y a pas de place pour le 'presque bon'. La SI doit être mécanique, les maths doivent être fulgurantes.", author: "Exigence Filière" },
-        { text: "Ne révise pas pour réussir. Révise pour que l'échec devienne mathématiquement impossible.", author: "Stratégie de Préparation" },
-        { text: "Le jury ne cherche pas des élèves qui ont compris le cours. Il cherche des élèves capables de l'utiliser comme une arme face à l'inconnu.", author: "Rapport de Jury X-ENS" },
-        { text: "La rigueur n'est pas une option esthétique. Une ligne de calcul non justifiée est une ligne qui n'existe pas.", author: "Méthodologie" },
-        { text: "Ce n'est pas la motivation qui te fera intégrer l'X en mai, c'est la discipline monacale que tu appliques en novembre.", author: "Règle de Constance" },
-        { text: "Un problème de concours n'est pas un obstacle, c'est une opportunité de prouver ta supériorité technique.", author: "Mentalité d'Assaut" }
-    ];
+    // --- 4. CITATIONS ---
+    const quotes = [{ text: "La rigueur n'est pas une option.", author: "Méthodologie" }];
+    document.getElementById('quoteText').innerText = `"${quotes[0].text}"`;
+    document.getElementById('quoteAuthor').innerText = `- ${quotes[0].author}`;
 
-    function generateQuote() {
-        const randomIndex = Math.floor(Math.random() * quotes.length);
-        document.getElementById('quoteText').innerText = `"${quotes[randomIndex].text}"`;
-        document.getElementById('quoteAuthor').innerText = `- ${quotes[randomIndex].author} -`;
-    }
-
-    // Générer une citation au chargement de la page
-    generateQuote();
 </script>
-
 </body>
 </html>
