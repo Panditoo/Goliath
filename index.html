@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Polytechnique | L'Exigence Absolue</title>
+    <title>Goliath | L'Exigence du Haut</title>
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,600;0,700;1,600&family=Inter:wght@300;400;500;700&display=swap" rel="stylesheet">
     
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
@@ -18,15 +18,20 @@
             --card-bg: #0f172a;
             --border-color: #1e293b;
             --danger: #ef4444;
+            --success: #10b981;
         }
 
         body {
             font-family: 'Inter', sans-serif;
             background-color: var(--bg-color);
             color: var(--text-color);
-            margin: 0;
-            padding: 0;
-            line-height: 1.6;
+            margin: 0; padding: 0; line-height: 1.6;
+            transition: background-color 0.5s ease;
+        }
+
+        /* Effet visuel lors d'une rupture de protocole */
+        body.radar-breach {
+            background-color: #2d0a0a;
         }
 
         header {
@@ -34,7 +39,20 @@
             text-align: center;
             border-bottom: 1px solid var(--border-color);
             background: linear-gradient(180deg, #020617 0%, var(--bg-color) 100%);
+            position: relative;
         }
+
+        .flight-hours {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            text-align: right;
+            font-size: 0.75rem;
+            letter-spacing: 2px;
+            color: var(--accent-color);
+        }
+
+        .flight-hours span { font-size: 1.2rem; display: block; color: #fff; font-weight: 700; }
 
         .motto {
             font-family: 'Playfair Display', serif;
@@ -47,24 +65,19 @@
 
         h1 {
             font-family: 'Playfair Display', serif;
-            font-size: 3rem;
-            letter-spacing: 4px;
-            margin: 0;
-            color: #ffffff;
+            font-size: 1.8rem;
+            letter-spacing: 5px;
             text-transform: uppercase;
-        }
-
-        .countdown {
-            font-size: 1.2rem;
             font-weight: 300;
-            letter-spacing: 2px;
-            margin-top: 15px;
+            color: var(--text-color);
+            border-left: 2px solid var(--x-red);
+            padding-left: 20px;
+            display: inline-block;
+            margin: 20px 0;
         }
 
-        .countdown span {
-            font-weight: 700;
-            color: var(--x-red);
-        }
+        .countdown { font-size: 1.1rem; font-weight: 300; letter-spacing: 2px; opacity: 0.8; }
+        .countdown span { color: var(--x-red); font-weight: 700; }
 
         main {
             max-width: 1300px;
@@ -75,47 +88,42 @@
             gap: 2rem;
         }
 
-        @media (max-width: 900px) {
-            main { grid-template-columns: 1fr; }
-        }
+        @media (max-width: 900px) { main { grid-template-columns: 1fr; } }
 
         .card {
             background: var(--card-bg);
             border: 1px solid var(--border-color);
             padding: 2rem;
             border-radius: 2px;
+            margin-bottom: 2rem;
+            position: relative;
         }
-        h1 {
-            font-family: 'Playfair Display', serif;
-            font-size: 1.8rem; /* Un peu plus petit pour le côté minimaliste */
-            letter-spacing: 5px; /* Espacement large pour l'élégance */
+
+        .radar-status {
+            position: absolute;
+            top: 10px;
+            right: 15px;
+            font-size: 0.6rem;
+            letter-spacing: 1px;
             text-transform: uppercase;
-            font-weight: 300; /* Plus fin pour le côté "Luxe" */
-            color: var(--text-color);
-            border-left: 2px solid var(--x-red); /* Un rappel discret de la couleur de l'école */
-            padding-left: 20px;
-            margin: 20px 0;
-        }   
+            font-weight: bold;
+        }
+
+        .status-active { color: var(--success); }
+        .status-idle { color: #475569; }
+
         h2 {
             font-family: 'Playfair Display', serif;
             border-bottom: 1px solid var(--border-color);
             padding-bottom: 0.8rem;
-            margin-top: 0;
             color: var(--accent-color);
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
+            font-size: 1.2rem;
+            letter-spacing: 1px;
         }
 
-        .task-input-container {
-            display: flex;
-            gap: 10px;
-            margin: 20px 0;
-        }
-
+        .task-input-container { display: flex; gap: 10px; margin: 20px 0; }
         input[type="text"] {
-            flex: 1;
-            padding: 12px;
+            flex: 1; padding: 12px;
             background: rgba(0, 0, 0, 0.5);
             border: 1px solid var(--border-color);
             color: white;
@@ -123,57 +131,37 @@
 
         button.add-btn {
             background: var(--x-red);
-            color: white;
-            border: none;
-            padding: 10px 25px;
-            font-weight: 700;
-            cursor: pointer;
+            color: white; border: none; padding: 10px 25px;
+            font-weight: 700; cursor: pointer; transition: 0.3s;
         }
 
         .task-list { list-style: none; padding: 0; }
+        
         .task-item {
-            display: flex;
-            justify-content: space-between;
-            padding: 15px 0;
-            border-bottom: 1px solid var(--border-color);
+            display: flex; justify-content: space-between;
+            padding: 12px 0; border-bottom: 1px solid #1e293b;
         }
 
-        .task-item.completed .task-text {
-            text-decoration: line-through;
-            color: #475569;
-        }
+        .task-item.completed { opacity: 0.5; }
+        .task-item.completed .task-text { text-decoration: line-through; color: var(--success); }
 
-        .timer {
-            font-size: 4.5rem;
-            font-family: 'Playfair Display', serif;
-            font-weight: 700;
-            text-align: center;
-        }
-
+        .timer { font-size: 5rem; font-family: 'Playfair Display', serif; text-align: center; font-weight: 700; margin: 20px 0; }
         .timer-controls { text-align: center; }
         .timer-controls button {
-            background: transparent;
-            color: var(--text-color);
-            border: 1px solid var(--border-color);
-            padding: 8px 20px;
-            cursor: pointer;
+            background: transparent; color: var(--text-color);
+            border: 1px solid var(--border-color); padding: 10px 25px;
+            cursor: pointer; text-transform: uppercase; font-size: 0.7rem; letter-spacing: 2px;
         }
+        .timer-controls button.start { background: var(--accent-color); color: #000; font-weight: 700; border: none; }
 
-        .timer-controls button.start {
-            background: var(--accent-color);
-            color: #000;
-            font-weight: 700;
-        }
-
-        .mentality-container {
-            border-left: 4px solid var(--x-red);
-            margin-top: 2rem;
-        }
+        .mentality-container { border-left: 4px solid var(--x-red); }
+        .jury-alert { color: var(--x-red); font-weight: 700; font-size: 0.7rem; text-transform: uppercase; margin-bottom: 5px; display: block; }
     </style>
 </head>
 <body>
 
 <header>
+    <div class="flight-hours">HEURES D'IMMERSION<span id="totalHours">0.0</span></div>
     <div class="motto">"Pour la Patrie, les Sciences et la Gloire"</div>
     <h1>L'EXIGENCE DU HAUT, LE MÉPRIS DU VIDE</h1>
     <div class="countdown" id="countdown">
@@ -183,33 +171,40 @@
 
 <main>
     <div class="card">
-        <h2>Ordres de Marche <span style="font-size: 0.8rem; color: #64748b;">(Sync Firebase Actif)</span></h2>
+        <h2>ORDRES DE MARCHE</h2>
         <div class="task-input-container">
-            <input type="text" id="taskInput" placeholder="Ex: Démonstration Cauchy-Lipschitz...">
-            <button class="add-btn" onclick="addTask()">Exécuter</button>
+            <input type="text" id="taskInput" placeholder="Nouvelle mission...">
+            <button class="add-btn" onclick="addTask()">EXÉCUTER</button>
         </div>
-        <ul class="task-list" id="taskList"></ul>
+        
+        <h3 style="font-size: 0.7rem; color: #475569; letter-spacing: 2px; margin-top: 30px;">EN COURS</h3>
+        <ul class="task-list" id="taskListPending"></ul>
+
+        <h3 style="font-size: 0.7rem; color: var(--success); letter-spacing: 2px; margin-top: 30px;">MISSIONS ACCOMPLIES</h3>
+        <ul class="task-list" id="taskListCompleted"></ul>
     </div>
 
     <div>
         <div class="card">
-            <h2 style="justify-content: center;">Immersion</h2>
+            <div id="radarBadge" class="radar-status status-idle">Silence Radar : Inactif</div>
+            <h2 style="text-align: center; border: none;">IMMERSION</h2>
             <div class="timer" id="timerDisplay">50:00</div>
             <div class="timer-controls">
-                <button class="start" onclick="startTimer()">Start</button>
+                <button class="start" id="startBtn" onclick="startTimer()">Start</button>
                 <button onclick="resetTimer()">Reset</button>
             </div>
         </div>
 
         <div class="card mentality-container">
-            <div id="quoteText" style="font-style: italic; margin-bottom: 10px;">Chargement...</div>
-            <div id="quoteAuthor" style="color: var(--accent-color); font-weight: bold; font-size: 0.8rem;"></div>
+            <span class="jury-alert" id="quoteType">Discipline</span>
+            <div id="quoteText" style="font-style: italic; margin-bottom: 10px; font-family: 'Playfair Display'; font-size: 1.1rem;">"La rigueur n'est pas une option."</div>
+            <div id="quoteAuthor" style="color: var(--accent-color); font-weight: bold; font-size: 0.7rem; text-transform: uppercase;"></div>
+            <button onclick="generateQuote()" style="background:none; border:none; color:#475569; font-size:0.6rem; cursor:pointer; text-decoration:underline; margin-top:10px;">NOUVELLE RÈGLE</button>
         </div>
     </div>
 </main>
 
 <script>
-    // ÉTAPE 2 : CONFIGURATION ET INITIALISATION
     const firebaseConfig = {
         apiKey: "AIzaSyA9aDL6TtLLs1WUl17NTLxnmaM6V1iP8Pc",
         authDomain: "gloliath.firebaseapp.com",
@@ -223,66 +218,49 @@
     firebase.initializeApp(firebaseConfig);
     const database = firebase.database();
     const tasksRef = database.ref('tasks');
+    const statsRef = database.ref('stats/totalTime');
 
-    // --- 1. COMPTE À REBOURS ---
+    let totalSecondsStored = 0;
+    statsRef.on('value', (snapshot) => {
+        totalSecondsStored = snapshot.val() || 0;
+        document.getElementById('totalHours').innerText = (totalSecondsStored / 3600).toFixed(1);
+    });
+
     const targetDate = new Date("May 3, 2027 08:00:00").getTime();
     function updateCountdown() {
         const now = new Date().getTime();
         const distance = targetDate - now;
-        const days = Math.floor(distance / (1000 * 60 * 60 * 24));
-        const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-        const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
-        document.getElementById("days").innerText = days.toString().padStart(3, '0');
-        document.getElementById("hours").innerText = hours.toString().padStart(2, '0');
-        document.getElementById("mins").innerText = minutes.toString().padStart(2, '0');
+        document.getElementById("days").innerText = Math.floor(distance / (86400000)).toString().padStart(3, '0');
+        document.getElementById("hours").innerText = Math.floor((distance % 86400000) / 3600000).toString().padStart(2, '0');
+        document.getElementById("mins").innerText = Math.floor((distance % 3600000) / 60000).toString().padStart(2, '0');
     }
     setInterval(updateCountdown, 1000);
-    updateCountdown();
 
-    // --- 2. GESTION DES TÂCHES AVEC FIREBASE ---
-    
-    // Écouter les changements en temps réel sur Firebase
     tasksRef.on('value', (snapshot) => {
         const data = snapshot.val();
-        renderTasks(data);
+        const pendingList = document.getElementById('taskListPending');
+        const completedList = document.getElementById('taskListCompleted');
+        pendingList.innerHTML = ''; completedList.innerHTML = '';
+        if (data) {
+            Object.keys(data).forEach(id => {
+                const task = data[id];
+                const li = document.createElement('li');
+                li.className = `task-item ${task.completed ? 'completed' : ''}`;
+                li.innerHTML = `<span class="task-text" style="cursor:pointer" onclick="toggleTask('${id}', ${task.completed})">${task.text}</span>
+                                <button style="background:none; border:none; color:#475569; cursor:pointer" onclick="deleteTask('${id}')">✕</button>`;
+                if(task.completed) completedList.appendChild(li); else pendingList.appendChild(li);
+            });
+        }
     });
-
-    function renderTasks(data) {
-        const taskList = document.getElementById('taskList');
-        taskList.innerHTML = '';
-        if (!data) return;
-
-        // On transforme l'objet Firebase en tableau pour l'afficher
-        Object.keys(data).forEach((id) => {
-            const task = data[id];
-            const li = document.createElement('li');
-            li.className = `task-item ${task.completed ? 'completed' : ''}`;
-            li.innerHTML = `
-                <span class="task-text" style="cursor:pointer" onclick="toggleTask('${id}', ${task.completed})">${task.text}</span>
-                <button style="background:none; border:none; color:#475569; cursor:pointer" onclick="deleteTask('${id}')">✕</button>
-            `;
-            taskList.appendChild(li);
-        });
-    }
 
     function addTask() {
         const input = document.getElementById('taskInput');
-        const text = input.value.trim();
-        if (text) {
-            tasksRef.push({ text: text, completed: false });
-            input.value = '';
-        }
+        if (input.value.trim()) { tasksRef.push({ text: input.value.trim(), completed: false }); input.value = ''; }
     }
+    function toggleTask(id, status) { tasksRef.child(id).update({ completed: !status }); }
+    function deleteTask(id) { tasksRef.child(id).remove(); }
 
-    function toggleTask(id, currentStatus) {
-        tasksRef.child(id).update({ completed: !currentStatus });
-    }
-
-    function deleteTask(id) {
-        tasksRef.child(id).remove();
-    }
-
-    // --- 3. POMODORO ---
+    // --- LOGIQUE POMODORO + MODE SILENCE RADAR ---
     let timerInterval;
     let timeLeft = 50 * 60;
     let isRunning = false;
@@ -296,31 +274,69 @@
     function startTimer() {
         if (isRunning) return;
         isRunning = true;
+        document.getElementById('startBtn').innerText = "MISSION EN COURS";
+        document.getElementById('radarBadge').innerText = "Silence Radar : ACTIF";
+        document.getElementById('radarBadge').className = "radar-status status-active";
+        
         timerInterval = setInterval(() => {
             if (timeLeft > 0) {
                 timeLeft--;
                 updateTimerDisplay();
+                if (timeLeft % 60 === 0) { statsRef.set(totalSecondsStored + 60); }
             } else {
-                clearInterval(timerInterval);
-                isRunning = false;
-                alert("Fin de session.");
-                resetTimer();
+                completeMission();
             }
         }, 1000);
+    }
+
+    function completeMission() {
+        clearInterval(timerInterval);
+        isRunning = false;
+        alert("Mission accomplie. Intégrité du radar maintenue.");
+        resetTimer();
     }
 
     function resetTimer() {
         clearInterval(timerInterval);
         isRunning = false;
         timeLeft = 50 * 60;
+        document.getElementById('startBtn').innerText = "START";
+        document.getElementById('radarBadge').innerText = "Silence Radar : Inactif";
+        document.getElementById('radarBadge').className = "radar-status status-idle";
+        document.body.classList.remove('radar-breach');
         updateTimerDisplay();
     }
 
-    // --- 4. CITATIONS ---
-    const quotes = [{ text: "La rigueur n'est pas une option.", author: "Méthodologie" }];
-    document.getElementById('quoteText').innerText = `"${quotes[0].text}"`;
-    document.getElementById('quoteAuthor').innerText = `- ${quotes[0].author}`;
+    // --- DETECTION DE RUPTURE DE DISCIPLINE ---
+    document.addEventListener("visibilitychange", () => {
+        if (document.hidden && isRunning) {
+            // Échec Critique
+            clearInterval(timerInterval);
+            isRunning = false;
+            document.body.classList.add('radar-breach');
+            document.getElementById('radarBadge').innerText = "RUPTURE RADAR : ÉCHEC";
+            document.getElementById('radarBadge').className = "radar-status";
+            document.getElementById('radarBadge').style.color = "var(--danger)";
+            
+            alert("ÉCHEC CRITIQUE : Vous avez quitté votre poste. La session est annulée.");
+            resetTimer();
+        }
+    });
 
+    const quotes = [
+        { type: "Rapport de Jury", text: "Le jury déplore une méconnaissance flagrante des schémas cinématiques.", author: "Banque PT" },
+        { type: "Rapport de Jury", text: "La rigueur n'est pas une option esthétique. Une ligne non justifiée est nulle.", author: "Épreuve Maths C" },
+        { type: "Discipline", text: "Ne révise pas pour réussir. Révise pour que l'échec soit impossible.", author: "Loi du Concours" },
+        { type: "Discipline", text: "La difficulté est un filtre. Elle élimine les autres, pas toi.", author: "Mentalité X" }
+    ];
+
+    function generateQuote() {
+        const q = quotes[Math.floor(Math.random() * quotes.length)];
+        document.getElementById('quoteType').innerText = q.type;
+        document.getElementById('quoteText').innerText = `"${q.text}"`;
+        document.getElementById('quoteAuthor').innerText = `- ${q.author} -`;
+    }
+    generateQuote();
 </script>
 </body>
 </html>
