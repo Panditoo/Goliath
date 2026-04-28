@@ -1,0 +1,415 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Goliath | L'Exigence du Haut</title>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,600;0,700;1,600&family=Inter:wght@300;400;500;700&display=swap" rel="stylesheet">
+    
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
+
+    <style>
+        :root {
+            --bg-color: #030712;
+            --text-color: #e2e8f0;
+            --accent-color: #d4af37;
+            --x-red: #8a1538;
+            --card-bg: #0f172a;
+            --border-color: #1e293b;
+            --danger: #ef4444;
+            --success: #10b981;
+            --today-bg: #1e1b4b;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            margin: 0; padding: 0; line-height: 1.6;
+            transition: background-color 0.5s ease;
+        }
+
+        body.radar-breach { background-color: #2d0a0a; }
+
+        header {
+            padding: 3rem 2rem 2rem;
+            text-align: center;
+            border-bottom: 1px solid var(--border-color);
+            background: linear-gradient(180deg, #020617 0%, var(--bg-color) 100%);
+            position: relative;
+        }
+
+        .flight-hours {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            text-align: right;
+            font-size: 0.75rem;
+            letter-spacing: 2px;
+            color: var(--accent-color);
+        }
+
+        .flight-hours span { font-size: 1.2rem; display: block; color: #fff; font-weight: 700; }
+
+        .motto {
+            font-family: 'Playfair Display', serif;
+            font-style: italic;
+            color: var(--accent-color);
+            font-size: 1rem;
+            letter-spacing: 1px;
+            margin-bottom: 1rem;
+        }
+
+        h1 {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.8rem;
+            letter-spacing: 5px;
+            text-transform: uppercase;
+            font-weight: 300;
+            color: var(--text-color);
+            border-left: 2px solid var(--x-red);
+            padding-left: 20px;
+            display: inline-block;
+            margin: 20px 0;
+        }
+
+        .countdown { font-size: 1.1rem; font-weight: 300; letter-spacing: 2px; opacity: 0.8; }
+        .countdown span { color: var(--x-red); font-weight: 700; }
+
+        main {
+            max-width: 1300px;
+            margin: 0 auto;
+            padding: 2rem;
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 2rem;
+        }
+
+        @media (max-width: 900px) { main { grid-template-columns: 1fr; } }
+
+        .card {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            padding: 2rem;
+            border-radius: 2px;
+            margin-bottom: 2rem;
+            position: relative;
+        }
+
+        .radar-status {
+            position: absolute;
+            top: 10px;
+            right: 15px;
+            font-size: 0.6rem;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            font-weight: bold;
+        }
+
+        .status-active { color: var(--success); }
+        .status-idle { color: #475569; }
+
+        h2 {
+            font-family: 'Playfair Display', serif;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 0.8rem;
+            color: var(--accent-color);
+            font-size: 1.2rem;
+            letter-spacing: 1px;
+        }
+
+        .task-input-container { display: flex; gap: 10px; margin: 20px 0; }
+        input[type="text"] {
+            flex: 1; padding: 12px;
+            background: rgba(0, 0, 0, 0.5);
+            border: 1px solid var(--border-color);
+            color: white;
+        }
+
+        button.add-btn {
+            background: var(--x-red);
+            color: white; border: none; padding: 10px 25px;
+            font-weight: 700; cursor: pointer; transition: 0.3s;
+        }
+
+        .task-list { 
+            list-style: none; padding: 0; min-height: 50px; 
+            border: 1px dashed transparent; transition: 0.3s;
+        }
+        .task-list.drag-over { border-color: var(--accent-color); background: rgba(212, 175, 55, 0.05); }
+        
+        .task-item {
+            display: flex; justify-content: space-between;
+            padding: 12px 10px; border-bottom: 1px solid #1e293b;
+            background: rgba(255,255,255,0.02);
+            margin-bottom: 4px;
+            cursor: grab;
+        }
+        .task-item:active { cursor: grabbing; }
+
+        .task-item.completed { opacity: 0.5; }
+        .task-item.completed .task-text { text-decoration: line-through; color: var(--success); }
+
+        .list-title { font-size: 0.7rem; color: #475569; letter-spacing: 2px; margin-top: 30px; text-transform: uppercase; }
+        .today-zone { background: var(--today-bg); padding: 10px; border-radius: 4px; border: 1px solid #312e81; }
+
+        .timer { font-size: 5rem; font-family: 'Playfair Display', serif; text-align: center; font-weight: 700; margin: 20px 0; }
+        .timer-controls { text-align: center; }
+        .timer-controls button {
+            background: transparent; color: var(--text-color);
+            border: 1px solid var(--border-color); padding: 10px 25px;
+            cursor: pointer; text-transform: uppercase; font-size: 0.7rem; letter-spacing: 2px;
+        }
+        .timer-controls button.start { background: var(--accent-color); color: #000; font-weight: 700; border: none; }
+
+        .mentality-container { border-left: 4px solid var(--x-red); }
+        .jury-alert { color: var(--x-red); font-weight: 700; font-size: 0.7rem; text-transform: uppercase; margin-bottom: 5px; display: block; }
+    </style>
+</head>
+<body>
+
+<header>
+    <div class="flight-hours">HEURES D'IMMERSION<span id="totalHours">0.0</span></div>
+    <div class="motto">"Pour la Patrie, les Sciences et la Gloire"</div>
+    <h1>L'EXIGENCE DU HAUT, LE MÉPRIS DU VIDE</h1>
+    <div class="countdown" id="countdown">
+        Banque PT dans : <span id="days">000</span>J <span id="hours">00</span>H <span id="mins">00</span>M
+    </div>
+</header>
+
+<main>
+    <div class="card">
+        <h2>ORDRES DE MARCHE</h2>
+        <div class="task-input-container">
+            <input type="text" id="taskInput" placeholder="Nouvelle mission...">
+            <button class="add-btn" onclick="addTask()">EXÉCUTER</button>
+        </div>
+        
+        <h3 class="list-title">EN RÉSERVE</h3>
+        <ul class="task-list" id="taskListPending" ondrop="drop(event, 'pending')" ondragover="allowDrop(event)"></ul>
+
+        <div class="today-zone">
+            <h3 class="list-title" style="color: var(--accent-color); margin-top: 0;">MISSIVES DU JOUR</h3>
+            <ul class="task-list" id="taskListToday" ondrop="drop(event, 'today')" ondragover="allowDrop(event)"></ul>
+        </div>
+
+        <h3 class="list-title" style="color: var(--success);">MISSIONS ACCOMPLIES</h3>
+        <ul class="task-list" id="taskListCompleted"></ul>
+    </div>
+
+    <div>
+        <div class="card">
+            <div id="radarBadge" class="radar-status status-idle">Silence Radar : Inactif</div>
+            <h2 style="text-align: center; border: none;">IMMERSION</h2>
+            <div class="timer" id="timerDisplay">50:00</div>
+            <div class="timer-controls">
+                <button class="start" id="startBtn" onclick="startTimer()">Start</button>
+                <button onclick="resetTimer()">Reset</button>
+            </div>
+        </div>
+
+        <div class="card mentality-container">
+            <span class="jury-alert" id="quoteType">Discipline</span>
+            <div id="quoteText" style="font-style: italic; margin-bottom: 10px; font-family: 'Playfair Display'; font-size: 1.1rem;">"La rigueur n'est pas une option."</div>
+            <div id="quoteAuthor" style="color: var(--accent-color); font-weight: bold; font-size: 0.7rem; text-transform: uppercase;"></div>
+            <button onclick="generateQuote()" style="background:none; border:none; color:#475569; font-size:0.6rem; cursor:pointer; text-decoration:underline; margin-top:10px;">CONSEIL SUIVANT</button>
+        </div>
+    </div>
+</main>
+
+<script>
+    // Config Firebase (Inchangée)
+    const firebaseConfig = {
+        apiKey: "AIzaSyA9aDL6TtLLs1WUl17NTLxnmaM6V1iP8Pc",
+        authDomain: "gloliath.firebaseapp.com",
+        databaseURL: "https://gloliath-default-rtdb.europe-west1.firebasedatabase.app",
+        projectId: "gloliath",
+        storageBucket: "gloliath.firebasestorage.app",
+        messagingSenderId: "699271135679",
+        appId: "1:699271135679:web:fd4b0c5dae74aca2f9610a"
+    };
+
+    firebase.initializeApp(firebaseConfig);
+    const database = firebase.database();
+    const tasksRef = database.ref('tasks');
+    const statsRef = database.ref('stats/totalTime');
+
+    // Stats
+    let totalSecondsStored = 0;
+    statsRef.on('value', (snapshot) => {
+        totalSecondsStored = snapshot.val() || 0;
+        document.getElementById('totalHours').innerText = (totalSecondsStored / 3600).toFixed(1);
+    });
+
+    // Countdown
+    const targetDate = new Date("May 3, 2027 08:00:00").getTime();
+    function updateCountdown() {
+        const now = new Date().getTime();
+        const distance = targetDate - now;
+        document.getElementById("days").innerText = Math.floor(distance / (86400000)).toString().padStart(3, '0');
+        document.getElementById("hours").innerText = Math.floor((distance % 86400000) / 3600000).toString().padStart(2, '0');
+        document.getElementById("mins").innerText = Math.floor((distance % 3600000) / 60000).toString().padStart(2, '0');
+    }
+    setInterval(updateCountdown, 1000);
+
+    // --- LOGIQUE DES TACHES & DRAG AND DROP ---
+    tasksRef.on('value', (snapshot) => {
+        const data = snapshot.val();
+        const pendingList = document.getElementById('taskListPending');
+        const todayList = document.getElementById('taskListToday');
+        const completedList = document.getElementById('taskListCompleted');
+        
+        pendingList.innerHTML = ''; todayList.innerHTML = ''; completedList.innerHTML = '';
+        
+        if (data) {
+            Object.keys(data).forEach(id => {
+                const task = data[id];
+                const li = document.createElement('li');
+                li.className = `task-item ${task.completed ? 'completed' : ''}`;
+                li.draggable = !task.completed;
+                li.ondragstart = (e) => e.dataTransfer.setData("text/plain", id);
+                
+                li.innerHTML = `
+                    <span class="task-text" style="cursor:pointer" onclick="toggleTask('${id}', ${task.completed})">${task.text}</span>
+                    <button style="background:none; border:none; color:#475569; cursor:pointer" onclick="deleteTask('${id}')">✕</button>
+                `;
+                
+                if (task.completed) {
+                    completedList.appendChild(li);
+                } else if (task.isToday) {
+                    todayList.appendChild(li);
+                } else {
+                    pendingList.appendChild(li);
+                }
+            });
+        }
+    });
+
+    function allowDrop(ev) {
+        ev.preventDefault();
+        ev.currentTarget.classList.add('drag-over');
+    }
+
+    function drop(ev, section) {
+        ev.preventDefault();
+        ev.currentTarget.classList.remove('drag-over');
+        const id = ev.dataTransfer.getData("text");
+        const isToday = (section === 'today');
+        tasksRef.child(id).update({ isToday: isToday });
+    }
+
+    // Retirer la classe visuelle quand on quitte la zone
+    document.querySelectorAll('.task-list').forEach(list => {
+        list.ondragleave = (e) => e.currentTarget.classList.remove('drag-over');
+    });
+
+    function addTask() {
+        const input = document.getElementById('taskInput');
+        if (input.value.trim()) { 
+            tasksRef.push({ 
+                text: input.value.trim(), 
+                completed: false, 
+                isToday: false 
+            }); 
+            input.value = ''; 
+        }
+    }
+
+    function toggleTask(id, status) { tasksRef.child(id).update({ completed: !status }); }
+    function deleteTask(id) { tasksRef.child(id).remove(); }
+
+    // --- LOGIQUE POMODORO ---
+    let timerInterval;
+    let timeLeft = 50 * 60;
+    let isRunning = false;
+
+    function updateTimerDisplay() {
+        const min = Math.floor(timeLeft / 60);
+        const sec = timeLeft % 60;
+        document.getElementById('timerDisplay').innerText = `${min.toString().padStart(2, '0')}:${sec.toString().padStart(2, '0')}`;
+    }
+
+    function startTimer() {
+        if (isRunning) return;
+        isRunning = true;
+        document.getElementById('startBtn').innerText = "MISSION EN COURS";
+        document.getElementById('radarBadge').innerText = "Silence Radar : ACTIF";
+        document.getElementById('radarBadge').className = "radar-status status-active";
+        
+        timerInterval = setInterval(() => {
+            if (timeLeft > 0) {
+                timeLeft--;
+                updateTimerDisplay();
+                if (timeLeft % 60 === 0) { statsRef.set(totalSecondsStored + 60); }
+            } else {
+                completeMission();
+            }
+        }, 1000);
+    }
+
+    function completeMission() {
+        clearInterval(timerInterval);
+        isRunning = false;
+        alert("Mission accomplie. Intégrité du radar maintenue.");
+        resetTimer();
+    }
+
+    function resetTimer() {
+        clearInterval(timerInterval);
+        isRunning = false;
+        timeLeft = 50 * 60;
+        document.getElementById('startBtn').innerText = "START";
+        document.getElementById('radarBadge').innerText = "Silence Radar : Inactif";
+        document.getElementById('radarBadge').className = "radar-status status-idle";
+        document.body.classList.remove('radar-breach');
+        updateTimerDisplay();
+    }
+
+    document.addEventListener("visibilitychange", () => {
+        if (document.hidden && isRunning) {
+            clearInterval(timerInterval);
+            isRunning = false;
+            document.body.classList.add('radar-breach');
+            document.getElementById('radarBadge').innerText = "RUPTURE RADAR : ÉCHEC";
+            document.getElementById('radarBadge').className = "radar-status";
+            document.getElementById('radarBadge').style.color = "var(--danger)";
+            alert("ÉCHEC CRITIQUE : Vous avez quitté votre poste.");
+            resetTimer();
+        }
+    });
+
+    // --- CITATIONS ET CONSEILS (RAPPORT DE JURY BANQUE PT) ---
+    const quotes = [
+        { type: "SI - Oral", text: "Il faut connaître la différence entre un schéma de principe, un schéma cinématique minimal et un schéma technologique.", author: "Banque PT 2023" },
+        { type: "Maths C", text: "Éviter d'essayer d'escroquer les correcteurs en trafiquant les calculs ; ceci indispose fortement le correcteur.", author: "Banque PT 2022" },
+        { type: "Physique A", text: "L'absence de schéma pour expliciter une réponse est souvent plus pénalisante qu'une longue explication confuse.", author: "Banque PT 2024" },
+        { type: "LV Anglais", text: "Il est illusoire de penser que recopier une phrase des documents passera inaperçu lors de la correction.", author: "Banque PT 2022" },
+        { type: "Maths B", text: "Chaque hypothèse d'un théorème doit être vérifiée explicitement avant son application.", author: "Banque PT 2023" },
+        { type: "Physique B", text: "L'oubli systématique des unités dans les applications numériques dénote un manque de sens physique.", author: "Banque PT 2023" },
+        { type: "SI - Écrit", text: "Un schéma cinématique minimal n'est pas une simple succession de liaisons, c'est une architecture.", author: "Banque PT 2023" },
+        { type: "Maths A", text: "Le jury déplore l'usage abusif de connecteurs logiques comme abréviations de la langue française.", author: "Banque PT 2024" },
+        { type: "Français A", text: "La lecture personnelle des œuvres est indispensable ; les résumés ne permettent pas d'atteindre les meilleures notes.", author: "Banque PT 2020" },
+        { type: "SI C", text: "La clarté des tracés et le soin apporté aux documents réponses sont des marques de respect pour le correcteur.", author: "Banque PT 2023" },
+        { type: "Maths C", text: "Toute tentative d'escroquerie intellectuelle sur un calcul faux est lourdement sanctionnée.", author: "Banque PT 2023" },
+        { type: "Physique A", text: "La maîtrise des ordres de grandeur est le premier garde-fou de l'ingénieur.", author: "Banque PT 2022" },
+        { type: "SI B", text: "La distinction entre schéma de principe et schéma technologique doit être parfaitement maîtrisée.", author: "Banque PT 2024" },
+        { type: "Maths B", text: "Une présentation soignée et des résultats encadrés facilitent grandement le travail de correction.", author: "Banque PT 2022" },
+        { type: "Français B", text: "L'orthographe et la syntaxe sont les vecteurs de votre crédibilité scientifique.", author: "Banque PT 2023" },
+        { type: "Info", text: "Ne négligez pas les questions de cours ; elles constituent le socle de la note.", author: "Banque PT 2022" },
+        { type: "SI - Oral", text: "La réactivité et la culture technique font la différence lors de l'entretien oral.", author: "Banque PT 2024" },
+        { type: "Physique B", text: "Le jury attend des candidats une capacité à critiquer la pertinence d'un modèle.", author: "Banque PT 2024" },
+        { type: "LV Allemand", text: "Le jury rappelle qu'un titre original et innovant en synthèse peut apporter des points précieux.", author: "Banque PT 2020" },
+        { type: "LV", text: "Le recours aux citations non analysées est fortement pénalisé.", author: "Banque PT 2022" }
+    ];
+
+    function generateQuote() {
+        const q = quotes[Math.floor(Math.random() * quotes.length)];
+        document.getElementById('quoteType').innerText = q.type;
+        document.getElementById('quoteText').innerText = `"${q.text}"`;
+        document.getElementById('quoteAuthor').innerText = `- ${q.author} -`;
+    }
+    generateQuote();
+</script>
+</body>
+</html>
